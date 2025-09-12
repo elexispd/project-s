@@ -70,8 +70,8 @@ class ClassList extends Component
         $newStatus = $class->status === 'active' ? 'inactive' : 'active';
 
         $class->update(['status' => $newStatus]);
-
-        session()->flash('success', "Class {$newStatus}d successfully.");
+        $s = $newStatus === 'active' ? 'activated' : 'deactivated';
+        session()->flash('success', "Class {$s} successfully.");
     }
 
     public function clearSearch()

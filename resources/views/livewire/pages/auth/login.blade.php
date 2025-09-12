@@ -67,9 +67,11 @@ new #[Layout('layouts.guest')] class extends Component
             {{-- <x-primary-button type="submit" loading="Logging in..." class="ms-3 btn btn-primary" >
                 {{ __('Log in') }}
             </x-primary-button> --}}
-            <button type="submit" class="btn btn-primary px-2" style="background: #1e40af; color: #fff; border-radius: 4px;">
+
+            <x-primary-button type="submit" loading="Loggin in..." class="px-3" style="background: #1e40af; color: #fff; border-radius: 4px;">
                 {{ __('Log in') }}
-            </button>
+            </x-primary-button>
+
         </div>
     </form>
 </div>

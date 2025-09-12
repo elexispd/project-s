@@ -76,10 +76,10 @@ class ClassArmList extends Component
     {
         $arm = ClassArm::findOrFail($armId);
         $newStatus = $arm->status === 'active' ? 'inactive' : 'active';
-
+        $s = $newStatus === 'active' ? 'activated' : 'deactivated';
         $arm->update(['status' => $newStatus]);
 
-        session()->flash('success', "Class arm {$newStatus}d successfully.");
+        session()->flash('success', "Class arm {$s} successfully.");
     }
 
     public function render()

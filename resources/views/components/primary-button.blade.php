@@ -1,5 +1,23 @@
-<button {{ $attributes->merge(['type' => 'submit', 'class' => 'w-full inline-flex items-center px-4 py-2 justify-center bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150']) }}>
-    {{ $slot }}
+@props([
+    'loading' => 'Processing...',
+    'target' => null, // allow passing a wire target dynamically
+])
+
+<button
+    {{ $attributes->merge([
+        'type' => 'button',
+        'class' => 'btn btn-primary',
+        'style' => 'background:#1e40af; border-color:#2563eb;',
+    ]) }}
+    wire:loading.attr="disabled"
+    @if($target) wire:target="{{ $target }}" @endif
+>
+    <span wire:loading.remove @if($target) wire:target="{{ $target }}" @endif>
+        {{ $slot }}
+    </span>
+
+    <span wire:loading @if($target) wire:target="{{ $target }}" @endif>
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        {{ $loading }}
+    </span>
 </button>
-
-

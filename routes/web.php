@@ -7,6 +7,8 @@ use App\Http\Controllers\ResumptionController;
 use App\Http\Controllers\VacationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PromotionController;
+use Livewire\Livewire;
+use App\Http\Livewire\ClassForm;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +26,6 @@ Route::view('/', 'welcome');
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-
     Route::resource('classes', App\Http\Controllers\SchoolClassController::class)
         ->names([
             'index' => 'classes.index',
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
             'update' => 'classes.update',
             'destroy' => 'classes.destroy'
         ]);
+
+
+
     Route::put('/classes/{class}/status', [App\Http\Controllers\SchoolClassController::class, 'updateStatus'])
         ->name('classes.updateStatus');
 

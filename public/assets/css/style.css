@@ -19,6 +19,11 @@ body {
   color: #444444;
 }
 
+.bg-primary {
+   background: #1e40af !important;
+   /* color: #1e40af !important; */
+}
+
 a {
   color: #4154f1;
   text-decoration: none;

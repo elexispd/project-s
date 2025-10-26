@@ -140,7 +140,7 @@
                                 @enderror
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" wire:click="closeModal">Cancel</button>
+                                <button type="button" class="btn btn-secondary rounded-pill" wire:click="closeModal">Cancel</button>
                                 <x-primary-button type="submit">
                                     Update
                                 </x-primary-button>

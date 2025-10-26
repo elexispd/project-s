@@ -6,12 +6,13 @@
 <button
     {{ $attributes->merge([
         'type' => 'button',
-        'class' => 'btn btn-primary',
+        'class' => 'btn btn-primary rounded-pill',
         'style' => 'background:#1e40af; border-color:#2563eb;',
     ]) }}
     wire:loading.attr="disabled"
     @if($target) wire:target="{{ $target }}" @endif
 >
+    <i class="bi bi-check-circle me-2"></i>
     <span wire:loading.remove @if($target) wire:target="{{ $target }}" @endif>
         {{ $slot }}
     </span>

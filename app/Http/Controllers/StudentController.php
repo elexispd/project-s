@@ -149,7 +149,14 @@ class StudentController extends Controller
                 ->where('class_arm', $request->classarm);
         }
 
-        $students = $query->get()->whereNull('graduated_at');
+        if ($request->filled('grad_year')) {
+            $query->whereYear('graduated_at', $request->grad_year);
+        } else {
+            $query->whereNull('graduated_at');
+        }
+
+        $students = $query->get();
+
 
         $classes = SchoolClass::where('status', 'active')->get();
 

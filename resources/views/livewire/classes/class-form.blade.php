@@ -55,7 +55,7 @@
                     <x-primary-button target="createClass"  type="submit">
                         Create
                     </x-primary-button>
-                  <button type="reset" class="btn btn-secondary">Reset</button>
+                  <button type="reset" class="btn btn-secondary rounded-pill">Reset</button>
                 </div>
               </form>
 

@@ -60,7 +60,14 @@ class PromotionController extends Controller
             'to_class_id'     => 'nullable|exists:school_classes,id',
             'to_class_arm_id' => 'nullable|exists:class_arms,id',
             'graduated'       => 'nullable|boolean',
-            'graduated_at'    => 'nullable|date'
+            'graduated_at'    => 'nullable|date',
+        ], [
+            'student_ids.required' => 'Please select at least one student.',
+            'student_ids.array'    => 'Invalid data format for selected students.',
+            'to_class_id.exists'   => 'The selected class does not exist.',
+            'to_class_arm_id.exists' => 'The selected class arm does not exist.',
+            'graduated.boolean'    => 'Graduated must be true or false.',
+            'graduated_at.date'    => 'Graduated date must be a valid date.',
         ]);
 
         foreach ($request->student_ids as $studentId) {
@@ -69,6 +76,7 @@ class PromotionController extends Controller
             if ($request->graduated) {
                 // mark student as graduated
                 $student->graduated_at = $request->graduated_at;
+                $student->status = $request->graduated;
                 $student->save();
             } else {
                 // normal promotion

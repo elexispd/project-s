@@ -16,11 +16,25 @@
         <div class="row">
             <div class="col-lg-12">
 
-                <div class="card">
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Student Promotion</h5>
+                    </div>
                     <div class="card-body">
-                        <h5 class="card-title">Promotion</h5>
-
                         <x-alerts />
+
+                        @if ($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-octagon me-1"></i>
+                                <strong>There were some problems with your input:</strong>
+                                <ul class="mb-0 mt-2">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        @endif
 
                         <form method="POST" action="{{ route('promotions.promote') }}">
                             @csrf
@@ -50,50 +64,58 @@
                                 </tbody>
                             </table>
 
-                            <div class="row mb-3">
-                                <div class="col-12 bg-info text-white text-center mb-2">
-                                    <h3>Promote To Section</h3>
-                                </div>
+                            @if ($students->isNotEmpty())
+                                <div class="row mb-3">
+                                    <div class="col-12 bg-primary p-1 text-white text-center mb-2">
+                                        <h3>Promote To Section</h3>
+                                    </div>
 
-                                {{-- Promote To Class/Arm --}}
-                                <div class="col-6" id="class_section">
-                                    <select name="to_class_id" id="class" class="form-control">
-                                        <option value="" disabled selected>Select Class</option>
-                                        @foreach ($classes as $class)
-                                            <option value="{{ $class->id }}"
-                                                {{ old('class_id') == $class->id ? 'selected' : '' }}>
-                                                {{ $class->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                    {{-- Promote To Class/Arm --}}
+                                    <div class="col-6" id="class_section">
+                                        <select name="to_class_id" id="class" class="form-control">
+                                            <option value="" disabled selected>Select Class</option>
+                                            @foreach ($classes as $class)
+                                                <option value="{{ $class->id }}"
+                                                    {{ old('class_id') == $class->id ? 'selected' : '' }}>
+                                                    {{ $class->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                                <div class="col-6 mt-2" id="classarm_section">
-                                    <select name="to_class_arm_id" id="classarm" class="form-control">
-                                        <option value="" disabled selected>Select Class Arm</option>
-                                    </select>
-                                </div>
+                                    <div class="col-6 mt-2" id="classarm_section">
+                                        <select name="to_class_arm_id" id="classarm" class="form-control">
+                                            <option value="" disabled selected>Select Class Arm</option>
+                                        </select>
+                                    </div>
 
-                                {{-- Graduated Checkbox --}}
-                                <div class="row mb-3 mt-3">
-                                    <div class="col-12">
-                                        <label>
-                                            <input type="checkbox" id="graduated_checkbox" name="graduated" value="1">
-                                            Graduated?
-                                        </label>
+                                    {{-- Graduated Checkbox --}}
+                                    <div class="row mb-3 mt-3">
+                                        <div class="col-12">
+                                            <label>
+                                                <input type="checkbox" id="graduated_checkbox" name="graduated"
+                                                    value="1">
+                                                Graduated?
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {{-- Graduation Date --}}
+                                    <div class="row mb-3" id="graduation_date_row" style="display: none;">
+                                        <div class="col-6">
+                                            <label for="graduated_at">Graduation Date</label>
+                                            <input type="date" name="graduated_at" id="graduated_at"
+                                                class="form-control">
+                                        </div>
                                     </div>
                                 </div>
 
-                                {{-- Graduation Date --}}
-                                <div class="row mb-3" id="graduation_date_row" style="display: none;">
-                                    <div class="col-6">
-                                        <label for="graduated_at">Graduation Date</label>
-                                        <input type="date" name="graduated_at" id="graduated_at" class="form-control">
-                                    </div>
+                                <button type="submit" class="btn btn-primary">Promote Selected</button>
+                            @else
+                                <div class="alert alert-warning text-center">
+                                    No students found.
                                 </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Promote Selected</button>
+                            @endif
                         </form>
 
                         <script>

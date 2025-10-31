@@ -154,4 +154,22 @@ Route::get('/check-result', [ResultController::class, 'index'])->name('results.i
 Route::post('/check-result', [ResultController::class, 'checkResult'])->name('results.check');
 
 
+//excel upload routes
+// Add these routes to your web.php file
+
+// Excel Upload Routes
+Route::get('/results/excel-upload', [ResultController::class, 'showExcelUploadForm'])
+    ->name('results.excel-upload');
+
+Route::post('/results/excel-upload', [ResultController::class, 'uploadExcel'])
+    ->name('results.excel-upload');
+
+Route::get('/results/download-template', [ResultController::class, 'downloadTemplate'])
+    ->name('results.download-template');
+
+
+
+
+
+
 require __DIR__.'/auth.php';

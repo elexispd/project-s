@@ -8,6 +8,9 @@ use App\Models\Student;
 use App\Models\Session;
 use App\Models\Subject;
 use App\Models\Result;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ResultsImport;
+use Illuminate\Support\Facades\Validator;
 
 class ResultController extends Controller
 {
@@ -893,4 +896,131 @@ class ResultController extends Controller
             'totalStudentsInClass' => $totalStudentsInClass
         ]);
     }
+
+
+
+
+
+  // excel uploads
+
+/**
+ * Show the Excel upload form
+ */
+public function showExcelUploadForm()
+{
+    $classes = SchoolClass::where('status', 'active')->get();
+    $subjects = Subject::where('status', 'active')->get();
+    $sessions = Session::where('status', 'active')->get();
+    return view('results.excel-upload', compact('classes', 'subjects', 'sessions'));
+}
+
+/**
+ * Handle Excel file upload and import
+ */
+public function uploadExcel(Request $request)
+{
+    $request->validate([
+        'excel_file' => 'required|mimes:xlsx,xls,csv|max:5120', // 5MB max
+        'session_id' => 'required|exists:sessions,id',
+        'term' => 'required|integer',
+        'school_class_id' => 'required|exists:school_classes,id',
+        'class_arm_id' => 'required|exists:class_arms,id',
+        'subject_id' => 'required|exists:subjects,id',
+    ]);
+
+    try {
+        // Import the Excel file
+        $import = new ResultsImport(
+            $request->session_id,
+            $request->term,
+            $request->school_class_id,
+            $request->class_arm_id,
+            $request->subject_id
+        );
+
+        Excel::import($import, $request->file('excel_file'));
+
+        // Update class statistics after import
+        $this->updateClassStatistics($request);
+
+        $successCount = $import->getSuccessCount();
+        $errorCount = $import->getErrorCount();
+        $errors = $import->getErrors();
+
+        if ($errorCount > 0) {
+            $errorMessages = implode('<br>', array_slice($errors, 0, 10));
+            if ($errorCount > 10) {
+                $errorMessages .= '<br>...and ' . ($errorCount - 10) . ' more errors';
+            }
+
+            return redirect()
+                ->route('results.excel-upload')
+                ->with('warning', "Imported {$successCount} results with {$errorCount} errors:<br>{$errorMessages}");
+        }
+
+        return redirect()
+            ->route('results.excel-upload')
+            ->with('success', "Successfully imported {$successCount} student results!");
+
+    } catch (\Exception $e) {
+        return redirect()
+            ->route('results.excel-upload')
+            ->with('error', 'Error importing file: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Download Excel template for results upload
+ */
+public function downloadTemplate(Request $request)
+{
+    $request->validate([
+        'school_class_id' => 'required|exists:school_classes,id',
+        'class_arm_id' => 'required|exists:class_arms,id',
+    ]);
+
+    // Get students for the selected class and arm
+    $students = Student::where('school_class_id', $request->school_class_id)
+        ->where('class_arm', $request->class_arm_id)
+        ->whereNull('graduated_at')
+        ->get(['id', 'first_name', 'last_name',  'admission_number']);
+
+    // Create CSV content
+    $csvData = [];
+    $csvData[] = ['Student ID', 'Admission Number', 'Full Name', 'CA1', 'CA2', 'CA3', 'CA4', 'Exam'];
+
+    foreach ($students as $student) {
+        $fullName = trim($student->first_name . ' ' . $student->other_name . ' ' . $student->last_name);
+        $csvData[] = [
+            $student->id,
+            $student->admission_number,
+            $fullName,
+            '', // CA1
+            '', // CA2
+            '', // CA3
+            '', // CA4
+            ''  // Exam
+        ];
+    }
+
+    // Generate filename
+    $class = SchoolClass::find($request->school_class_id);
+    $arm = \App\Models\ClassArm::find($request->class_arm_id);
+    $filename = 'results_template_' . $class->name . '_' . $arm->name . '_' . date('Y-m-d') . '.csv';
+
+    // Create response
+    $callback = function() use ($csvData) {
+        $file = fopen('php://output', 'w');
+        foreach ($csvData as $row) {
+            fputcsv($file, $row);
+        }
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    ]);
+}
+
 }
